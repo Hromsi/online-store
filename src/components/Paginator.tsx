@@ -12,7 +12,7 @@ import {
 
 export default function Paginator({ 
     pagesQuantity, 
-    handlePageChange 
+    handlePageChange,
 } : { 
     pagesQuantity: number;
     handlePageChange: (newPage: number) => void;
@@ -32,6 +32,7 @@ export default function Paginator({
         ...baseStyles,
         background: 'blue.300'
     };
+
     return (
         <Flex gap="30px">
             <ChaPaginator
@@ -41,20 +42,20 @@ export default function Paginator({
                 activeStyles={activeStyles}
                 baseStyles={baseStyles}
             >
-            <Previous bg="white">
-                prev
-            </Previous>
-            <PageGroup>
-                {generatePages(pagesQuantity)?.map((page) => (
-                <Page
-                    key={`paginator_page_${page}`}
-                    page={page}
-                />
-                ))}
-            </PageGroup>
-            <Next >
-                next
-            </Next>
+                <Previous bg="white">
+                    prev
+                </Previous>
+                <PageGroup>
+                    {generatePages(pagesQuantity)?.map((page) => (
+                    <Page
+                        key={`paginator_page_${page}`}
+                        page={page}
+                    />
+                    ))}
+                </PageGroup>
+                <Next >
+                    next
+                </Next>
             </ChaPaginator>
         </Flex>
     );

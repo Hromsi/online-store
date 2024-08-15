@@ -8,3 +8,14 @@ export interface IProduct {
     title: string;
     price: number;
 };
+
+export interface ICategory {
+    slug: string;
+    name: string;
+    url: string;
+};
+
+export interface ISelectItem {
+    label: string;
+    value: string;
+};
