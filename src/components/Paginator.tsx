@@ -32,9 +32,10 @@ export default function Paginator({
         ...baseStyles,
         background: 'blue.300'
     };
-
+    
     return (
         <Flex gap="30px">
+            {/* @ts-ignore */}
             <ChaPaginator
                 onPageChange={handlePageChange}
                 pagesQuantity={pagesQuantity - 1}
@@ -46,6 +47,7 @@ export default function Paginator({
                     prev
                 </Previous>
                 <PageGroup>
+                    {/* @ts-ignore */}
                     {generatePages(pagesQuantity)?.map((page) => (
                     <Page
                         key={`paginator_page_${page}`}
