@@ -1,41 +1,43 @@
 'use client';
 
 import Card from "@/components/Card";
-import { Flex, Grid } from "@chakra-ui/react";
+import { Flex, Grid, Text, Box } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { IProduct } from "../../types";
 import Paginator from "@/components/Paginator";
 import Container from "@/components/blocks/Container";
 import CategoryMenu from "@/components/CategoryMenu";
+import { useQuery } from "react-query";
 
 const PAGE_SIZE = 8;
 
+async function fetchProducts(curPage: number, curCategory: string): Promise<any> {
+	const url = `https://dummyjson.com/products${curCategory ? `/category/${curCategory}` : ''}?limit=${PAGE_SIZE}&skip=${PAGE_SIZE * curPage}`;
+	const response = await axios.get(url);
+
+	return response.data;
+}
+
 export default function Home() {
-	const [products, setProducts] = useState<IProduct[]>([]);
 	const [curPage, setCurPage] = useState<number>(0);
-	const [pagesQuantity, setPagesQuantity] = useState(1);
 	const [curCategory, setCurCategory] = useState<string>('');
+	
+
+	const { data: productsData, isLoading, isError } = useQuery(
+		['products', curPage, curCategory],
+		() => fetchProducts(curPage, curCategory),
+		{
+		  keepPreviousData: true,
+		}
+	);
+	const pagesQuantity = productsData ? Math.ceil(productsData?.total / PAGE_SIZE) + 1 : 1;
 
 	const handlePageChange = (page: number) => {
-		setCurPage(page);
+		setCurPage(page - 1);
 	};
 
-	const fetchProducts = () => {
-		const url = `https://dummyjson.com/products${curCategory ? `/category/${curCategory}` : ''}?limit=${PAGE_SIZE}&skip=${PAGE_SIZE * curPage}`;
-
-		axios.get(url)
-			.then(function (response) {
-				const { products: dataProducts, total } = response.data;
-				setProducts(dataProducts);
-				setPagesQuantity(Math.ceil(total / PAGE_SIZE));
-				console.log('response :>> ', response.data);
-		});
-	}
-
-	useEffect(() => {
-		fetchProducts();
-	}, [curPage, curCategory, pagesQuantity]);
+  	if (isError) return <div>Error occurred</div>;
 
 	return (
 	<main>
@@ -47,18 +49,23 @@ export default function Home() {
 				setCurPage={setCurPage}
 			/>
 			<Grid templateColumns={['repeat(1, 1fr)', 'repeat(2, 1fr)', 'repeat(3, 1fr)', 'repeat(4, 1fr)']} gap="25px" mb="25px">
-				{products.map((product) => (
-					<Card 
-						key={product.id}
-						id={product.id}
-						brand={product.brand}
-						stock={product.stock}
-						description={product.description}
-						images={product.images}
-						thumbnail={product.thumbnail}
-						title={product.title}
-						price={product.price}
-					/>
+				{isLoading ? (
+					<Box>Loading...</Box>
+				) : (
+					productsData?.products?.length ? (productsData.products.map((product: IProduct) => (
+						<Card 
+							key={product.id}
+							id={product.id}
+							brand={product.brand}
+							stock={product.stock}
+							description={product.description}
+							images={product.images}
+							thumbnail={product.thumbnail}
+							title={product.title}
+							price={product.price}
+						/>
+					))) : (
+						<Text as="span">Not found</Text>
 				))}
 			</Grid>
 			<Flex justifyContent="center" mb="25px">
